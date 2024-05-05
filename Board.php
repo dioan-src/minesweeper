@@ -105,9 +105,7 @@ class Board
     public function getAdjacentMines(int $centerHeight, int $centerLength): int
     {
         $adjacentMines = 0;
-        // echo 'center is ' . $centerHeight . ' ' . $centerLength . ' ';echo PHP_EOL;
-        // echo 'limits are ' . $this->height . ' ' . $this->length . ' ';echo PHP_EOL;
-
+        
         $startHeight = $centerHeight - 1;                   //set start height of outer loop
         $startLength = $centerLength - 1;                   //set start length of outer loop
         $endHeight = $startHeight + self::SUB_BOARD_HEIGHT; //set finishing height of inner loop
@@ -115,22 +113,14 @@ class Board
         
         for ($h = $startHeight ; $h < $endHeight; $h++) {
             for ($l = $startLength ; $l < $endLength; $l++) {
-                // echo $h . ' ' . $l . ' ';
-                //exclude center cell
+                
                 if ($h == $centerHeight && $l == $centerLength){ continue;}
-                // echo ' after 1';
-                //exclude cell out of array
                 if ($h < 0 || $h >= $this->height){ continue;}
-                // echo ' after 2';
                 if ($l < 0 || $l >= $this->length){ continue;} 
-                // echo ' after 3';    
-                // echo ' added ' . $this->board[$h][$l] . ' ';
+                
                 $adjacentMines += $this->board[$h][$l];
-                // echo PHP_EOL;
             }
         }
-        // echo ' got ' . $adjacentMines;
-        // die();
         return $adjacentMines;
     }
 
@@ -139,37 +129,45 @@ class Board
         $board = $this->getBoard();
 
         // Print column numbers
-        echo "     ";
+        echo "  ";
         for ($j = 0; $j < $this->length; $j++) {
-            echo $j + 1 . " ";
+            $this->formatCellOutput($j + 1);
         }
         echo PHP_EOL;
-        echo "     ";
+        echo "  ";
         for ($j = 0; $j < $this->length; $j++) {
-            echo " _";
+            $this->formatCellOutput('_');
         }
         echo PHP_EOL;
 
         // Print board with row numbers and cells
         for ($i = 0; $i < $this->height; $i++) {
             // Print row number
-            $padded_column = str_pad($i + 1, 4, ' ', STR_PAD_LEFT);
-            echo $padded_column . "| ";
+            $this->formatCellOutput(output:$i + 1,  suffix:'|');
 
             // Print cells
             for ($j = 0; $j < $this->length; $j++) {
+                //remove padding for the first column of cells
+                $positionPadflag = $j!=0;
                 if ($board[$i][$j]->getHasMine()){
-                    echo self::SHOW_MINE;
+                    $this->formatCellOutput(output:self::SHOW_MINE, pad:$positionPadflag);
                 }else{
                     if ($board[$i][$j]->getValue()){
-                        echo $board[$i][$j]->getValue();
+                        $this->formatCellOutput(output:$board[$i][$j]->getValue(), pad:$positionPadflag);
                     }else{
-                        echo ' ';
+                        $this->formatCellOutput(output:' ', pad:$positionPadflag);
                     }
                 }
-                echo ' ';
+                
             }
             echo '|' . PHP_EOL;
         }
+    }
+
+
+    public function formatCellOutput($output, $pad = true, $suffix = ' '): void
+    {
+        if ($pad) $output = str_pad($output, 2, ' ', STR_PAD_LEFT);
+        echo $output . $suffix;
     }
 }
