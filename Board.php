@@ -8,17 +8,18 @@ class Board
     private int $height;
     private int $minesNum;    
     private array $board;
+    const MINES_PERCENTAGE = 0.18;
     const SUB_BOARD_HEIGHT = 3;
     const SUB_BOARD_LENGTH = 3;
     const IS_HIDDEN = 0;
-    const SHOW_MINE = 'X ';
-    const SHOW_HIDDEN_SQUARE = '\u{25A0} ';
+    const SHOW_MINE = '*';
+    const SHOW_HIDDEN_SQUARE = '\u{25A0}';
 
-    public function __construct(int $length, int $height, int $minesNum)
+    public function __construct(int $length, int $height)
     {
         $this->length = $length;
         $this->height = $height;
-        $this->minesNum = $minesNum;
+        $this->minesNum = (int)$length*$height*self::MINES_PERCENTAGE;
         $this->initializeBoard();
     }
 
@@ -66,7 +67,7 @@ class Board
     {
         $boardWithMines = $this->createBoardWithRandomizedMines();
 
-        //TODO CHANGE THIS - I DONT WANT TO SET A BOARD AND THEN RESET IT.
+        //TODO - CHANGE THIS - I DONT WANT TO SET A BOARD AND THEN RESET IT.
         $this->setBoard($boardWithMines);
 
         $boardMadeOfSquares = $this->initializeSquaresOfBoard($boardWithMines);
@@ -84,7 +85,7 @@ class Board
         $finalArray = array_merge($minesArray, $nonMinesArray);
         shuffle($finalArray);
         //chunk the array based on the constructor height, to create the final board
-        return array_chunk($finalArray, $this->height);;
+        return array_chunk($finalArray, $this->length);
     }
 
     public function initializeSquaresOfBoard(array $boardValues): array
@@ -138,17 +139,22 @@ class Board
         $board = $this->getBoard();
 
         // Print column numbers
-        echo "   ";
+        echo "     ";
         for ($j = 0; $j < $this->length; $j++) {
             echo $j + 1 . " ";
         }
         echo PHP_EOL;
-        echo '   _ _ _ _ _ _ _ _' . PHP_EOL;
+        echo "     ";
+        for ($j = 0; $j < $this->length; $j++) {
+            echo " _";
+        }
+        echo PHP_EOL;
 
         // Print board with row numbers and cells
         for ($i = 0; $i < $this->height; $i++) {
             // Print row number
-            echo $i + 1 . "| ";
+            $padded_column = str_pad($i + 1, 4, ' ', STR_PAD_LEFT);
+            echo $padded_column . "| ";
 
             // Print cells
             for ($j = 0; $j < $this->length; $j++) {
@@ -156,14 +162,14 @@ class Board
                     echo self::SHOW_MINE;
                 }else{
                     if ($board[$i][$j]->getValue()){
-                        echo $board[$i][$j]->getValue() . ' ';
+                        echo $board[$i][$j]->getValue();
                     }else{
-                        echo '  ';
+                        echo ' ';
                     }
                 }
-                // echo ($board[$i][$j]->getHasMine()) ? 'X ' : $board[$i][$j]->getValue() . ' ' ;
+                echo ' ';
             }
-            echo PHP_EOL;
+            echo '|' . PHP_EOL;
         }
     }
 }
