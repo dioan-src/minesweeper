@@ -7,20 +7,32 @@ class Board
     private int $length;
     private int $height;
     private int $minesNum;    
-    private array $board;
+    private array $grid;
     const MINES_PERCENTAGE = 0.18;
-    const SUB_BOARD_HEIGHT = 3;
-    const SUB_BOARD_LENGTH = 3;
+    const SUB_GRID_HEIGHT = 3;
+    const SUB_GRID_LENGTH = 3;
     const IS_HIDDEN = 0;
     const SHOW_MINE = '*';
     const SHOW_HIDDEN_SQUARE = '\u{25A0}';
 
-    public function __construct(int $length, int $height)
+    public function __construct(int $length = 0, int $height = 0, array $presetGrid = null)
     {
-        $this->length = $length;
-        $this->height = $height;
-        $this->minesNum = (int)$length*$height*self::MINES_PERCENTAGE;
-        $this->initializeBoard();
+        if($presetGrid) {
+            $this->setGrid($presetGrid);
+            //count of array -> height
+            $this->height = count($presetGrid);
+            //count of transposed array -> height
+            $this->length = count(array_map(null, ...$presetGrid));
+            //count of summed 1s
+            $this->minesNum = $numberOfOnes = array_sum(array_map('array_sum', $presetGrid));
+        }else if($length && $height){
+            $this->length = $length;
+            $this->height = $height;
+            $this->minesNum = (int)$length*$height*self::MINES_PERCENTAGE;
+            $this->setGrid($this->createGridWithRandomizedMines());
+        }
+        $this->initializeSquaresOfGrid();
+        //TODO set neighbors of squares
     }
 
     // Setter for $length
@@ -54,28 +66,16 @@ class Board
     }
 
     // Setter for $minesNum
-    public function setBoard(array $board): void {
-        $this->board = $board;
+    public function setGrid(array $board): void {
+        $this->grid = $board;
     }
 
     // Getter for $minesNum
-    public function getBoard(): array {
-        return $this->board;
+    public function getGrid(): array {
+        return $this->grid;
     }
 
-    public function initializeBoard()
-    {
-        $boardWithMines = $this->createBoardWithRandomizedMines();
-
-        //TODO - CHANGE THIS - I DONT WANT TO SET A BOARD AND THEN RESET IT.
-        $this->setBoard($boardWithMines);
-
-        $boardMadeOfSquares = $this->initializeSquaresOfBoard($boardWithMines);
-         
-        $this->setBoard($boardMadeOfSquares);
-    }
-
-    public function createBoardWithRandomizedMines(): array
+    public function createGridWithRandomizedMines(): array
     {
         //create mines array with $this->minesNum elements, based on the constructor of Board
         $minesArray = array_fill(0, ($this->minesNum), 1);
@@ -88,18 +88,19 @@ class Board
         return array_chunk($finalArray, $this->length);
     }
 
-    public function initializeSquaresOfBoard(array $boardValues): array
+    public function initializeSquaresOfGrid(): void
     {
-        $boardOfSquares = [];
+
+        $gridOfSquares = [];
         for ($i = 0; $i < $this->height; $i++) {
 
             for ($j = 0; $j < $this->length; $j++) {
-                $boardOfSquares[$i][$j] = new Square( $this->getAdjacentMines($i, $j), $j, $i, (bool)$boardValues[$i][$j], false, false);
+                $gridOfSquares[$i][$j] = new Square( $this->getAdjacentMines($i, $j), $j, $i, (bool)$this->getGrid()[$i][$j], false, false);
             }
             
         }
-
-        return $boardOfSquares;
+        
+        $this->setGrid($gridOfSquares);
     }
 
     public function getAdjacentMines(int $centerHeight, int $centerLength): int
@@ -108,8 +109,8 @@ class Board
         
         $startHeight = $centerHeight - 1;                   //set start height of outer loop
         $startLength = $centerLength - 1;                   //set start length of outer loop
-        $endHeight = $startHeight + self::SUB_BOARD_HEIGHT; //set finishing height of inner loop
-        $endLength = $startLength + self::SUB_BOARD_LENGTH; //set finishing length of inner loop
+        $endHeight = $startHeight + self::SUB_GRID_HEIGHT; //set finishing height of inner loop
+        $endLength = $startLength + self::SUB_GRID_LENGTH; //set finishing length of inner loop
         
         for ($h = $startHeight ; $h < $endHeight; $h++) {
             for ($l = $startLength ; $l < $endLength; $l++) {
@@ -118,7 +119,7 @@ class Board
                 if ($h < 0 || $h >= $this->height){ continue;}
                 if ($l < 0 || $l >= $this->length){ continue;} 
                 
-                $adjacentMines += $this->board[$h][$l];
+                $adjacentMines += $this->getGrid()[$h][$l];
             }
         }
         return $adjacentMines;
@@ -126,8 +127,6 @@ class Board
 
     public function display()
     {
-        $board = $this->getBoard();
-
         // Print column numbers
         echo "  ";
         for ($j = 0; $j < $this->length; $j++) {
@@ -149,16 +148,15 @@ class Board
             for ($j = 0; $j < $this->length; $j++) {
                 //remove padding for the first column of cells
                 $positionPadflag = $j!=0;
-                if ($board[$i][$j]->getHasMine()){
+                if ($this->getGrid()[$i][$j]->getHasMine()){
                     $this->formatCellOutput(output:self::SHOW_MINE, pad:$positionPadflag);
                 }else{
-                    if ($board[$i][$j]->getValue()){
-                        $this->formatCellOutput(output:$board[$i][$j]->getValue(), pad:$positionPadflag);
+                    if ($this->getGrid()[$i][$j]->getValue()){
+                        $this->formatCellOutput(output:$this->getGrid()[$i][$j]->getValue(), pad:$positionPadflag);
                     }else{
                         $this->formatCellOutput(output:' ', pad:$positionPadflag);
                     }
                 }
-                
             }
             echo '|' . PHP_EOL;
         }
