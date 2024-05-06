@@ -9,8 +9,8 @@ class Board
     private int $minesNum;    
     private array $grid;
     const MINES_PERCENTAGE = 0.18;
-    const SUB_GRID_HEIGHT = 3;
-    const SUB_GRID_LENGTH = 3;
+    const SUB_GRID_DISTANCE_FROM_CENTER_HEIGHT = 1;
+    const SUB_GRID_DISTANCE_FROM_CENTER_LENGTH = 1;
     const IS_HIDDEN = 0;
     const SHOW_MINE = '*';
     const SHOW_HIDDEN_SQUARE = '\u{25A0}';
@@ -107,17 +107,15 @@ class Board
     {
         $adjacentMines = 0;
         
-        $startHeight = $centerHeight - 1;                   //set start height of outer loop
-        $startLength = $centerLength - 1;                   //set start length of outer loop
-        $endHeight = $startHeight + self::SUB_GRID_HEIGHT; //set finishing height of inner loop
-        $endLength = $startLength + self::SUB_GRID_LENGTH; //set finishing length of inner loop
+        $startHeight = max(($centerHeight - 1), 0);                   //set start height of outer loop
+        $startLength = max(($centerLength - 1), 0);                   //set start length of outer loop
+        $endHeight = min(($centerHeight + self::SUB_GRID_DISTANCE_FROM_CENTER_HEIGHT), ($this->height - 1)); //set finishing height of inner loop
+        $endLength = min(($centerLength + self::SUB_GRID_DISTANCE_FROM_CENTER_LENGTH), ($this->length - 1)); //set finishing length of inner loop
         
-        for ($h = $startHeight ; $h < $endHeight; $h++) {
-            for ($l = $startLength ; $l < $endLength; $l++) {
-                
+        for ($h = $startHeight ; $h <= $endHeight; $h++) {
+            for ($l = $startLength ; $l <= $endLength; $l++) {
+                //exclude center element
                 if ($h == $centerHeight && $l == $centerLength){ continue;}
-                if ($h < 0 || $h >= $this->height){ continue;}
-                if ($l < 0 || $l >= $this->length){ continue;} 
                 
                 $adjacentMines += $this->getGrid()[$h][$l];
             }
