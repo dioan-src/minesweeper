@@ -135,4 +135,26 @@ class Square{
     public function getNorthWest(): ?Square {
         return $this->northWest;
     }
+
+    public function getNeighborWithName(string $name): ?Square
+    {
+        $neighborFunc = 'get' . $name;
+
+        if ( !method_exists($this, $neighborFunc) ) return null;
+
+        return $this->$neighborFunc();
+    }
+
+    public function isCorrectlyFlagged(): bool {
+        foreach (array_keys(SquareParameters::NEIGHBORS) as $neighborName) {
+
+            $neighbor = $this->getNeighborWithName($neighborName);
+
+            if ($neighbor) {
+                if ( $neighbor->getHasMine() != $neighbor->getIsFlagged() ) return false;
+            }  
+
+        }
+        return true;
+    }
 }
