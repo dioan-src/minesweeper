@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/Square.php';
 require_once __DIR__ . '/SquareParameters.php';
+require_once __DIR__ . '/BoardParameters.php';
 
 // class for  the minsweeper board
 class Board
@@ -9,12 +10,8 @@ class Board
     private int $height;
     private int $minesNum;    
     private array $grid;
-    const MINES_PERCENTAGE = 0.18;
-    const SUB_GRID_DISTANCE_FROM_CENTER_HEIGHT = 1;
-    const SUB_GRID_DISTANCE_FROM_CENTER_LENGTH = 1;
-    const IS_HIDDEN = 0;
-    const SHOW_MINE = '*';
-    const SHOW_HIDDEN_SQUARE = '\u{25A0}';
+    
+    
 
     public function __construct(int $length = 0, int $height = 0, array $presetGrid = null)
     {
@@ -29,7 +26,7 @@ class Board
         }else if($length && $height){
             $this->length = $length;
             $this->height = $height;
-            $this->minesNum = (int)$length*$height*self::MINES_PERCENTAGE;
+            $this->minesNum = (int)$length*$height*BoardParameters::MINES_PERCENTAGE;
             $this->setGrid($this->createGridWithRandomizedMines());
         }
         $this->initializeSquaresOfGrid();
@@ -95,7 +92,12 @@ class Board
         $gridOfSquares = [];
         for ($i = 0; $i < $this->height; $i++) {
             for ($j = 0; $j < $this->length; $j++) {
-                $gridOfSquares[$i][$j] = new Square( $this->getAdjacentMines($i, $j),(bool)$this->getGrid()[$i][$j], SquareParameters::NOT_FLAGGED, SquareParameters::NOT_REVEALED);
+                $gridOfSquares[$i][$j] = new Square(
+                    $this->getAdjacentMines($i, $j),
+                    (bool)$this->getGrid()[$i][$j], 
+                    SquareParameters::NOT_FLAGGED, 
+                    SquareParameters::NOT_REVEALED
+                );
             }
             
         }
@@ -111,8 +113,8 @@ class Board
         // Calculate the starting and ending positions of the subgrid
         $startHeight = max(($centerHeight - 1), 0);                   //set start height of outer loop
         $startLength = max(($centerLength - 1), 0);                   //set start length of outer loop
-        $endHeight = min(($centerHeight + self::SUB_GRID_DISTANCE_FROM_CENTER_HEIGHT), ($this->height - 1)); //set finishing height of inner loop
-        $endLength = min(($centerLength + self::SUB_GRID_DISTANCE_FROM_CENTER_LENGTH), ($this->length - 1)); //set finishing length of inner loop
+        $endHeight = min(($centerHeight + BoardParameters::SUB_GRID_DISTANCE_FROM_CENTER_HEIGHT), ($this->height - 1)); //set finishing height of inner loop
+        $endLength = min(($centerLength + BoardParameters::SUB_GRID_DISTANCE_FROM_CENTER_LENGTH), ($this->length - 1)); //set finishing length of inner loop
         // Iterate over each square in the subgrid
         for ($h = $startHeight ; $h <= $endHeight; $h++) {
             for ($l = $startLength ; $l <= $endLength; $l++) {
@@ -136,10 +138,9 @@ class Board
                     //set direction of neighbor and setter function based on neighbor name
                     $neighborHeight = $i + $direction['heightDiffFromCenter'];
                     $neighborLength = $j + $direction['lengthDiffFromCenter'];
-                    $neighborFunc = 'set' . $neighborName ;
                     
                     //set Square as neighbor if exists or null
-                    $grid[$i][$j]->$neighborFunc( $this->getSquareAt($neighborHeight, $neighborLength) );
+                    $this->getSquareAt($i, $j)->setNeighborWithName($neighborName, $this->getSquareAt($neighborHeight, $neighborLength));
                 }
             }
         }
@@ -174,7 +175,7 @@ class Board
                 //remove padding for the first column of cells
                 $positionPadflag = $j!=0;
                 if ($this->getSquareAt($i, $j)->getHasMine()){
-                    $this->formatCellOutput(output:self::SHOW_MINE, pad:$positionPadflag);
+                    $this->formatCellOutput(output:BoardParameters::MINE_DISPLAY_SYMBOL, pad:$positionPadflag);
                 }else{
                     if ($this->getSquareAt($i, $j)->getNeighboringMines()){
                         $this->formatCellOutput(output:$this->getSquareAt($i, $j)->getNeighboringMines(), pad:$positionPadflag);

@@ -1,4 +1,5 @@
 <?php 
+require_once __DIR__ . '/SquareParameters.php';
 
 // class for every Square on the minsweeper board
 class Square{
@@ -134,6 +135,15 @@ class Square{
 
     public function getNorthWest(): ?Square {
         return $this->northWest;
+    }
+
+    public function setNeighborWithName(string $name, ?Square $neighbor): void
+    {
+        $neighborFunc = 'set' . $name;
+
+        if ( !method_exists($this, $neighborFunc) ) return ;
+
+        $this->$neighborFunc($neighbor);
     }
 
     public function getNeighborWithName(string $name): ?Square
