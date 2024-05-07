@@ -10,26 +10,27 @@ class Board
     private int $height;
     private int $minesNum;    
     private array $grid;
-    
-    
+    private array $nonMinedCellCoordinates;
 
     public function __construct(int $length = 0, int $height = 0, array $presetGrid = null)
     {
         if($presetGrid) {
-            $this->setGrid($presetGrid);
             //count of array -> height
             $this->height = count($presetGrid);
             //count of transposed array -> height
             $this->length = count(array_map(null, ...$presetGrid));
             //count of summed 1s
             $this->minesNum = $numberOfOnes = array_sum(array_map('array_sum', $presetGrid));
+            $finalGrid = $presetGrid;
         }else if($length && $height){
             $this->length = $length;
             $this->height = $height;
             $this->minesNum = (int)$length*$height*BoardParameters::MINES_PERCENTAGE;
-            $this->setGrid($this->createGridWithRandomizedMines());
+            $zeros = $this->create2dArrayOfZeros();
+            $finalGrid = $this->generateMines($zeros);
         }
-        $this->initializeSquaresOfGrid();
+        $this->setNonMinedCellCoordinates($finalGrid);
+        $this->setGridMadeOfSquares($finalGrid);
         //TODO set neighbors of squares
         $this->setNeighborsOfSquares();
     }
@@ -74,40 +75,80 @@ class Board
         return $this->grid;
     }
 
-    public function createGridWithRandomizedMines(): array
-    {
-        //create mines array with $this->minesNum elements, based on the constructor of Board
-        $minesArray = array_fill(0, ($this->minesNum), 1);
-        //create non-mines array with x elements, based on the constructor of Board
-        $nonMinesArray = array_fill(0, ($this->height*$this->length-$this->minesNum), 0);
-        //merge arrays and shuffle to get the final array
-        $finalArray = array_merge($minesArray, $nonMinesArray);
-        shuffle($finalArray);
-        //chunk the array based on the constructor height, to create the final board
-        return array_chunk($finalArray, $this->length);
+    // Getter for $nonMinedCellCoordinates
+    public function getNonMinedCellCoordinates(): array {
+        return $this->nonMinedCellCoordinates;
     }
 
-    public function initializeSquaresOfGrid(): void
+    /**
+    * Creates a 2d array containing only 0s, based on the dimenstions set in the constructor
+    */
+    public function create2dArrayOfZeros(): array
+    {
+        $row = array_fill(0, $this->length, 0);
+        return array_fill(0, $this->height, $row);
+    }
+
+    /**
+    * Randomly generates mines in the grid, based on the minesNum set in the constructor
+    */
+    public function generateMines(array $grid): array
+    {
+        $minesGenerated = 0;
+        $totalCells = $this->height * $this->length;
+
+        while ($minesGenerated < $this->minesNum) {
+            //get random position in 2d array
+            $random = random_int(0, $totalCells-1);
+            $randomHeight = intdiv($random, $this->length);
+            $randomLength = $random % $this->length;
+            //set only if position doesnt already contain a mine
+            if ($grid[$randomHeight][$randomLength] == 0) {
+                $grid[$randomHeight][$randomLength] = 1;
+                $minesGenerated++;
+            }
+        }
+        return $grid;
+    }
+
+    /**
+    * Creates an array of all the Cells that dont contain a mine
+    */
+    public function setNonMinedCellCoordinates(array $grid): void
+    {
+        $nonMinedCellCoordinates = [];
+        for ($i = 0; $i < $this->height; $i++) {
+            for ($j = 0; $j < $this->length; $j++) {
+                if ($grid[$i][$j] == 0) $nonMinedCellCoordinates[] = ['height' => $i, 'length' => $j];
+            }
+        }
+        $this->nonMinedCellCoordinates = $nonMinedCellCoordinates;
+    }
+
+    /**
+    * Creates a grid out of Squares based on the generated grid
+    * of 1s(cells containing a mine) and 0s (cells not containing a mine)
+    */
+    public function setGridMadeOfSquares(array $grid): void
     {
         $gridOfSquares = [];
         for ($i = 0; $i < $this->height; $i++) {
             for ($j = 0; $j < $this->length; $j++) {
                 $gridOfSquares[$i][$j] = new Square(
-                    $this->getAdjacentMines($i, $j),
-                    (bool)$this->getGrid()[$i][$j], 
+                    $this->getAdjacentMines($i, $j, $grid),
+                    (bool)$grid[$i][$j], 
                     SquareParameters::NOT_FLAGGED, 
                     SquareParameters::NOT_REVEALED
                 );
             }
-            
         }
         $this->setGrid($gridOfSquares);
     }
 
     /**
-    * Calculates the number of adjacent mines surrounding a given square on the minesweeper board.
+    * Calculates the number of adjacent mines surrounding a given(center) square on the minesweeper board.
     */
-    public function getAdjacentMines(int $centerHeight, int $centerLength): int
+    public function getAdjacentMines(int $centerHeight, int $centerLength, array $grid): int
     {
         $adjacentMines = 0;
         // Calculate the starting and ending positions of the subgrid
@@ -121,12 +162,15 @@ class Board
                 // Exclude center element
                 if ($h == $centerHeight && $l == $centerLength){ continue;}
                 // Increment the count of adjacent mines if the square contains a mine
-                $adjacentMines += $this->getGrid()[$h][$l];
+                $adjacentMines += $grid[$h][$l];
             }
         }
         return $adjacentMines;
     }
 
+    /**
+    * Set the 8 neighboring Squares of every Square in the grid
+    */
     public function setNeighborsOfSquares()
     {
         $grid = $this->getGrid();
@@ -146,11 +190,17 @@ class Board
         }
     }
 
+    /**
+    * Fetches the Square in the coordinates given if it exists, or return null 
+    */
     public function getSquareAt(int $height, int $length): ?Square
     {
         return $this->validateGridBoundaries($height, $length) ? $this->grid[$height][$length] : null;
     }
 
+    /**
+    * Display the current position of the grid of Squares
+    */
     public function display()
     {
         // Print column numbers
@@ -188,16 +238,29 @@ class Board
         }
     }
 
-
+    /**
+    * Format the output, used by the display function
+    */
     public function formatCellOutput($output, $pad = true, $suffix = ' '): void
     {
         if ($pad) $output = str_pad($output, 2, ' ', STR_PAD_LEFT);
         echo $output . $suffix;
     }
 
+    /**
+    * Checks if coordinates are within the bounds of the grid
+    */
     public function validateGridBoundaries(int $height, int $length)
     {
         return ($height >= 0 && $height < $this->height) &&
             ($length >= 0 && $length < $this->length);
+    }
+
+    public function areAllNonMinedCellsRevealed()
+    {
+        foreach ($this->nonMinedCellCoordinates as $nonMinedCell) {
+            if ($this->getSquareAt($nonMinedCell['height'], $nonMinedCell['length'])->getIsRevealed()==false) return false;
+        }
+        return true;
     }
 }
