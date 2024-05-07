@@ -10,10 +10,11 @@ class Board
     private int $height;
     private int $minesNum;    
     private array $grid;
-    private array $nonMinedCellCoordinates;
+    private int $revealedCounter;
 
     public function __construct(int $length = 0, int $height = 0, array $presetGrid = null)
     {
+        $this->revealedCounter = 0;
         if($presetGrid) {
             //count of array -> height
             $this->height = count($presetGrid);
@@ -29,7 +30,6 @@ class Board
             $zeros = $this->create2dArrayOfZeros();
             $finalGrid = $this->generateMines($zeros);
         }
-        $this->setNonMinedCellCoordinates($finalGrid);
         $this->setGridMadeOfSquares($finalGrid);
         //TODO set neighbors of squares
         $this->setNeighborsOfSquares();
@@ -66,6 +66,16 @@ class Board
     }
 
     // Setter for $minesNum
+    public function setRevealedCounter(int $updatedCounter): void {
+        $this->revealedCounter = $updatedCounter;
+    }
+
+    // Getter for $minesNum
+    public function getRevealedCounter(): int {
+        return $this->revealedCounter;
+    }
+
+    // Setter for $minesNum
     public function setGrid(array $grid): void {
         $this->grid = $grid;
     }
@@ -73,11 +83,6 @@ class Board
     // Getter for $minesNum
     public function getGrid(): array {
         return $this->grid;
-    }
-
-    // Getter for $nonMinedCellCoordinates
-    public function getNonMinedCellCoordinates(): array {
-        return $this->nonMinedCellCoordinates;
     }
 
     /**
@@ -109,20 +114,6 @@ class Board
             }
         }
         return $grid;
-    }
-
-    /**
-    * Creates an array of all the Cells that dont contain a mine
-    */
-    public function setNonMinedCellCoordinates(array $grid): void
-    {
-        $nonMinedCellCoordinates = [];
-        for ($i = 0; $i < $this->height; $i++) {
-            for ($j = 0; $j < $this->length; $j++) {
-                if ($grid[$i][$j] == 0) $nonMinedCellCoordinates[] = ['height' => $i, 'length' => $j];
-            }
-        }
-        $this->nonMinedCellCoordinates = $nonMinedCellCoordinates;
     }
 
     /**
@@ -256,11 +247,11 @@ class Board
             ($length >= 0 && $length < $this->length);
     }
 
-    public function areAllNonMinedCellsRevealed()
+    /**
+    * Checks if all non-mined squares on the grid have been revealed
+    */
+    public function areAllNonMinedCellsRevealed(): bool
     {
-        foreach ($this->nonMinedCellCoordinates as $nonMinedCell) {
-            if ($this->getSquareAt($nonMinedCell['height'], $nonMinedCell['length'])->getIsRevealed()==false) return false;
-        }
-        return true;
+        return $this->revealedCounter == $this->length*$this->height-$this->minesNum;
     }
 }
