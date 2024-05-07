@@ -254,4 +254,45 @@ class Board
     {
         return $this->revealedCounter == $this->length*$this->height-$this->minesNum;
     }
+
+    /**
+    * what happens when player touches an already revealed Square
+    */
+    public function touchSquare(int $height, int $length): void
+    {
+        //TODO fetch square
+        //TODO check square is revealed
+        //TODO check neighboring squares of center have been correctly flagged
+        //TODO use revealAllNeighbors
+    }
+
+    /**
+    * what happens when a player flags/unflags an closed Square
+    */
+    public function flagSquare(int $height, int $length): void
+    {
+        //TODO fetch square
+        //TODO check square is hidden
+        //TODO flag/unflag square
+    }
+
+    /**
+    * what happens when a player reveals a closed Square
+    */
+    public function revealSquare(int $height, int $length): void
+    {
+        //TODO fetch square
+        //TODO check square is hidden
+        //TODO reveal square
+        //TODO use revealAllNeighbors if revealed square has 0 neighboringMines
+    }
+
+    /**
+    * reveal all neighbors of a square
+    */
+    public function revealAllNeighbors(int $height, int $length): void
+    {
+        //TODO reveal all neighboring squares
+        //TODO if any square has 0 neighboringMines, call this function again
+    }
 }
