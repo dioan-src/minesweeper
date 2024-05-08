@@ -8,7 +8,6 @@ class Square{
     private bool $hasMine;
     private bool $isFlagged;
     private bool $isRevealed;
-    private bool $isEdgeSquare;
 
     private ?Square $north;
     private ?Square $northEast;
@@ -63,14 +62,6 @@ class Square{
 
     public function getIsRevealed(): bool {
         return $this->isRevealed;
-    }
-
-    public function setIsEdgeSquare(bool $isEdgeSquare): void {
-        $this->isEdgeSquare = $isEdgeSquare;
-    }
-
-    public function getIsEdgeSquare(): bool {
-        return $this->isEdgeSquare;
     }
 
     public function setNorth(?Square $north): void {

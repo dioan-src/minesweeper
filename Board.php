@@ -11,10 +11,12 @@ class Board
     private int $minesNum;    
     private array $grid;
     private int $revealedCounter;
+    private int $isGameOver;
 
     public function __construct(int $length = 0, int $height = 0, array $presetGrid = null)
     {
-        $this->revealedCounter = 0;
+        $this->setRevealedCounter(0);
+        $this->setIsGameOver(false);
         if($presetGrid) {
             //count of array -> height
             $this->height = count($presetGrid);
@@ -65,12 +67,12 @@ class Board
         return $this->minesNum;
     }
 
-    // Setter for $minesNum
+    // Setter for $revealedCounter
     public function setRevealedCounter(int $updatedCounter): void {
         $this->revealedCounter = $updatedCounter;
     }
 
-    // Getter for $minesNum
+    // Getter for $revealedCounter
     public function getRevealedCounter(): int {
         return $this->revealedCounter;
     }
@@ -83,6 +85,16 @@ class Board
     // Getter for $minesNum
     public function getGrid(): array {
         return $this->grid;
+    }
+
+    // Setter for $isGameOver
+    public function setIsGameOver(int $isGameOver): void {
+        $this->isGameOver = $isGameOver;
+    }
+
+    // Getter for $isGameOver
+    public function getIsGameOver(): int {
+        return $this->isGameOver;
     }
 
     /**
@@ -213,17 +225,24 @@ class Board
 
             // Print cells
             for ($j = 0; $j < $this->length; $j++) {
+                $square = $this->getSquareAt($i, $j);
+                
                 //remove padding for the first column of cells
-                $positionPadflag = $j!=0;
-                if ($this->getSquareAt($i, $j)->getHasMine()){
-                    $this->formatCellOutput(output:BoardParameters::MINE_DISPLAY_SYMBOL, pad:$positionPadflag);
-                }else{
-                    if ($this->getSquareAt($i, $j)->getNeighboringMines()){
-                        $this->formatCellOutput(output:$this->getSquareAt($i, $j)->getNeighboringMines(), pad:$positionPadflag);
-                    }else{
-                        $this->formatCellOutput(output:' ', pad:$positionPadflag);
-                    }
+                $positionPadflag = true;
+                
+                if ($square->getIsRevealed() == false){
+                    $this->formatCellOutput(output:BoardParameters::HIDDEN_SQUARE_DISPLAY_SYMBOL, pad:true, suffix:'  ');
+                    continue;
                 }
+
+                if ($square->getHasMine()){
+                    $this->formatCellOutput(output:BoardParameters::MINE_DISPLAY_SYMBOL, pad:false, suffix:'  ');
+                    continue;
+                }
+
+                $val = $square->getNeighboringMines() != 0 ? $square->getNeighboringMines() : ' ';
+                $this->formatCellOutput(output:$val, pad:false, suffix:'  ');
+                continue;
             }
             echo '|' . PHP_EOL;
         }
@@ -256,11 +275,20 @@ class Board
     }
 
     /**
+    * Checks if game is not over
+    */
+    public function isGameOver(): bool
+    {
+        return $this->isGameOver;
+    }
+
+    /**
     * what happens when player touches an already revealed Square
     */
     public function touchSquare(int $height, int $length): void
     {
         //TODO fetch square
+        $square = $this->getSquareAt($height, $length);
         //TODO check square is revealed
         //TODO check neighboring squares of center have been correctly flagged
         //TODO use revealAllNeighbors
@@ -272,27 +300,42 @@ class Board
     public function flagSquare(int $height, int $length): void
     {
         //TODO fetch square
+        $square = $this->getSquareAt($height, $length);
         //TODO check square is hidden
+
         //TODO flag/unflag square
     }
 
     /**
     * what happens when a player reveals a closed Square
     */
-    public function revealSquare(int $height, int $length): void
+    public function revealSquare(?Square $square): void
     {
-        //TODO fetch square
-        //TODO check square is hidden
-        //TODO reveal square
-        //TODO use revealAllNeighbors if revealed square has 0 neighboringMines
+        if (!$square) return;
+        if ($square->getIsRevealed()) return;
+        //reveal square
+        $square->setIsRevealed(true);
+        //if square has mine, set game as over and get out if func
+        if ($square->getHasMine()){$this->setIsGameOver(true); return;}
+        // //if square has no neighboring mines, reveale all neighboring squares
+        if ($square->getNeighboringMines() == 0) $this->revealAllNeighbors($square);
     }
 
     /**
     * reveal all neighbors of a square
     */
-    public function revealAllNeighbors(int $height, int $length): void
+    public function revealAllNeighbors(?Square $square): void
     {
-        //TODO reveal all neighboring squares
-        //TODO if any square has 0 neighboringMines, call this function again
+        foreach (array_keys(SquareParameters::NEIGHBORS) as $neighborName) {
+            $neighbor = $square->getNeighborWithName($neighborName);
+            //go to next if there is no neighbor
+            if (!$neighbor) continue;
+            //go to the next if its already revealed
+            if ($neighbor->getIsRevealed()) continue;
+            //reveal square
+            $neighbor?->setIsRevealed(true);
+            //if square has no neighboring mines, reveal all neighboring squares
+            if ($neighbor->getNeighboringMines() == 0) $this->revealAllNeighbors($neighbor);
+        }
     }
 }
