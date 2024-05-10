@@ -1,5 +1,5 @@
-<?php 
-require_once __DIR__ . '/SquareParameters.php';
+<?php
+require_once __DIR__ . '/../utils/SquareParameters.php';
 
 // class for every Square on the minsweeper board
 class Square{

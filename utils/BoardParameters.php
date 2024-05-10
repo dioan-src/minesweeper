@@ -7,5 +7,5 @@ class BoardParameters
     
     const MINE_DISPLAY_SYMBOL = '*';
     const HIDDEN_SQUARE_DISPLAY_SYMBOL = '■';
-    const FLAGGED_SQUARE_DISPLAY_SYMBOL = 'f';
+    const FLAGGED_SQUARE_DISPLAY_SYMBOL = '⚑';
 }

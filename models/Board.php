@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/Square.php';
-require_once __DIR__ . '/SquareParameters.php';
-require_once __DIR__ . '/BoardParameters.php';
+require_once __DIR__ . '/../utils/SquareParameters.php';
+require_once __DIR__ . '/../utils/BoardParameters.php';
 
 // class for  the minsweeper board
 class Board
@@ -11,7 +11,7 @@ class Board
     private int $minesNum;    
     private array $grid;
     private int $revealedCounter;
-    private int $isGameOver;
+    private bool $isGameOver;
 
     public function __construct(int $length = 0, int $height = 0, array $presetGrid = null)
     {
@@ -88,12 +88,12 @@ class Board
     }
 
     // Setter for $isGameOver
-    public function setIsGameOver(int $isGameOver): void {
+    public function setIsGameOver(bool $isGameOver): void {
         $this->isGameOver = $isGameOver;
     }
 
     // Getter for $isGameOver
-    public function getIsGameOver(): int {
+    public function getIsGameOver(): bool {
         return $this->isGameOver;
     }
 
@@ -318,12 +318,14 @@ class Board
     {
         if (!$square) return;
         if ($square->getIsRevealed()) return;
-        //reveal square
         $square->setIsRevealed(true);
+        $this->setRevealedCounter( $this->getRevealedCounter()+1);
         //if square has mine, set game as over and get out if func
         if ($square->getHasMine()){$this->setIsGameOver(true); return;}
         // //if square has no neighboring mines, reveale all neighboring squares
         if ($square->getNeighboringMines() == 0) $this->revealAllNeighbors($square);
+        //set game is over if all non-mined cells have been revealed
+        if ($this->areAllNonMinedCellsRevealed()) $this->setIsGameOver(true);
     }
 
     /**
@@ -336,16 +338,16 @@ class Board
     {
         foreach (array_keys(SquareParameters::NEIGHBORS) as $neighborName) {
             $neighbor = $square->getNeighborWithName($neighborName);
-            //go to next if there is no neighbor
             if (!$neighbor) continue;
-            //go to the next if its already revealed
             if ($neighbor->getIsRevealed()) continue;
             //dont open if square has mine (used by touch func)
             if ($neighbor->getHasMine()) continue;
-            //reveal square
             $neighbor?->setIsRevealed(true);
+            $this->setRevealedCounter( $this->getRevealedCounter()+1);
             //if square has no neighboring mines, reveal all neighboring squares
             if ($neighbor->getNeighboringMines() == 0) $this->revealAllNeighbors($neighbor);
         }
+        //set game is over if all non-mined cells have been revealed
+        if ($this->areAllNonMinedCellsRevealed()) $this->setIsGameOver(true);
     }
 }
