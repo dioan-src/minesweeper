@@ -231,6 +231,12 @@ class Board
                 $positionPadflag = true;
                 
                 if ($square->getIsRevealed() == false){
+
+                    if ($square->getIsFlagged()){
+                        $this->formatCellOutput(output:BoardParameters::FLAGGED_SQUARE_DISPLAY_SYMBOL, pad:false, suffix:'  ');
+                        continue;
+                    }
+
                     $this->formatCellOutput(output:BoardParameters::HIDDEN_SQUARE_DISPLAY_SYMBOL, pad:true, suffix:'  ');
                     continue;
                 }
@@ -285,30 +291,29 @@ class Board
     /**
     * what happens when player touches an already revealed Square
     */
-    public function touchSquare(int $height, int $length): void
+    public function touchSquare(?Square $square): void
     {
-        //TODO fetch square
-        $square = $this->getSquareAt($height, $length);
-        //TODO check square is revealed
-        //TODO check neighboring squares of center have been correctly flagged
-        //TODO use revealAllNeighbors
+        if (!$square) return;
+        if ($square->getIsRevealed() == false) return;
+        if ($square->isCorrectlyFlagged()) $this->revealAllNeighbors($square);
     }
 
     /**
-    * what happens when a player flags/unflags an closed Square
-    */
-    public function flagSquare(int $height, int $length): void
+     * Toggles the flag status of a closed Square on the game board.
+     */
+    public function flagSquare(?Square $square): void
     {
-        //TODO fetch square
-        $square = $this->getSquareAt($height, $length);
-        //TODO check square is hidden
-
-        //TODO flag/unflag square
+        if (!$square) return;
+        if ($square->getIsRevealed()) return;
+        //flag/unflag square
+        $square->setIsFlagged( !$square->getIsFlagged() );
     }
 
     /**
-    * what happens when a player reveals a closed Square
-    */
+     * Reveals a closed Square on the game board. 
+     * If the Square contains a mine, the game is set as over.
+     * Otherwise, if the Square has no neighboring mines, all neighboring squares are revealed.
+     */
     public function revealSquare(?Square $square): void
     {
         if (!$square) return;
@@ -322,8 +327,11 @@ class Board
     }
 
     /**
-    * reveal all neighbors of a square
-    */
+     * Reveals all neighboring squares of a given Square that haven't been revealed yet.
+     * Iterates through all neighboring squares of the provided Square.
+     * If the neighboring square has no neighboring mines, all of its neighboring 
+     * squares are also revealed.
+     */
     public function revealAllNeighbors(?Square $square): void
     {
         foreach (array_keys(SquareParameters::NEIGHBORS) as $neighborName) {
@@ -332,6 +340,8 @@ class Board
             if (!$neighbor) continue;
             //go to the next if its already revealed
             if ($neighbor->getIsRevealed()) continue;
+            //dont open if square has mine (used by touch func)
+            if ($neighbor->getHasMine()) continue;
             //reveal square
             $neighbor?->setIsRevealed(true);
             //if square has no neighboring mines, reveal all neighboring squares
