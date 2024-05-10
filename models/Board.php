@@ -13,16 +13,13 @@ class Board
     private int $revealedCounter;
     private bool $isGameOver;
 
-    public function __construct(int $length = 0, int $height = 0, array $presetGrid = null)
+    public function __construct(int $length = 0, int $height = 0, array $presetGrid = null, int $seedHeight = 0, int $seedLength = 0)
     {
         $this->setRevealedCounter(0);
         $this->setIsGameOver(false);
         if($presetGrid) {
-            //count of array -> height
             $this->height = count($presetGrid);
-            //count of transposed array -> height
             $this->length = count(array_map(null, ...$presetGrid));
-            //count of summed 1s
             $this->minesNum = $numberOfOnes = array_sum(array_map('array_sum', $presetGrid));
             $finalGrid = $presetGrid;
         }else if($length && $height){
@@ -30,10 +27,9 @@ class Board
             $this->height = $height;
             $this->minesNum = (int)$length*$height*BoardParameters::MINES_PERCENTAGE;
             $zeros = $this->create2dArrayOfZeros();
-            $finalGrid = $this->generateMines($zeros);
+            $finalGrid = $this->generateMines($zeros, $seedHeight, $seedLength);
         }
         $this->setGridMadeOfSquares($finalGrid);
-        //TODO set neighbors of squares
         $this->setNeighborsOfSquares();
     }
 
@@ -109,7 +105,7 @@ class Board
     /**
     * Randomly generates mines in the grid, based on the minesNum set in the constructor
     */
-    public function generateMines(array $grid): array
+    public function generateMines(array $grid,int $seedHeight, int $seedLength): array
     {
         $minesGenerated = 0;
         $totalCells = $this->height * $this->length;
@@ -119,6 +115,7 @@ class Board
             $random = random_int(0, $totalCells-1);
             $randomHeight = intdiv($random, $this->length);
             $randomLength = $random % $this->length;
+            if ($this->checkMineIsTooCloseToSeed($randomHeight, $randomLength, $seedHeight, $seedLength)) continue;
             //set only if position doesnt already contain a mine
             if ($grid[$randomHeight][$randomLength] == 0) {
                 $grid[$randomHeight][$randomLength] = 1;
@@ -126,6 +123,11 @@ class Board
             }
         }
         return $grid;
+    }
+
+    public function checkMineIsTooCloseToSeed(int $randomHeight, int $randomLength, int $seedHeight, int $seedLength): bool
+    {
+        return abs($randomHeight - $seedHeight) <= 1 && abs($randomLength - $seedLength) <= 1;
     }
 
     /**

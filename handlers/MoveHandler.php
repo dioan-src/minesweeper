@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/GameParameters.php';
+require_once __DIR__ . '/../utils/GameParameters.php';
 
 /**
  * Handles the processing of user moves in the Minesweeper game.
@@ -61,5 +61,23 @@ class MoveHandler
         $row = (int)$moveParts[1] - 1;
         $column = (int)$moveParts[2] - 1;
         return [$move, $row, $column];
+    }
+
+    //functions for starting move
+    public static function getStart(): array|bool
+    {
+        $startFlag=true;
+        while($startFlag){
+            $seed = readline("Enter your starting move eg 3-5: ");
+            
+            $parts = explode('-', $seed);
+            if (count($parts) != 2) continue;
+            if (is_numeric($parts[0]) == false) continue;
+            if (is_numeric($parts[1]) == false) continue;
+            $startFlag = false;
+        }
+        $row = (int)$parts[0];
+        $column = (int)$parts[1];
+        return [$row, $column];
     }
 }
