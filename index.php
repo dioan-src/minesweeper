@@ -41,7 +41,11 @@
             <div class="columns is-centered">
                 <div class="column">
                     <div id="grid-container" class="box" style="display: none;">
-                        <!-- Grid will be dynamically generated here -->                    
+                            <table id="minesweeper-table" class="table is-bordered is-fullwidth">
+                                <tbody>
+                                    <!-- Table content will be dynamically generated here -->
+                                </tbody>
+                            </table>
                     </div>
                 </div>
             </div>

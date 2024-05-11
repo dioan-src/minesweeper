@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function() {
     var level8x8Button = document.getElementById("level-8x8");
     var level16x16Button = document.getElementById("level-16x16");
     var level16x30Button = document.getElementById("level-16x30");
-    var backToLevelButton = document.getElementById("back-to-level-button");
+    var backToLevelButton = document.getElementById("back-to-level");
 
     startButton.addEventListener("click", function() {
         document.getElementById("start-container").style.display = "none";
@@ -32,22 +32,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
     backToLevelButton.addEventListener("click", function () {
         levelContainer.style.display = "block";
-        gridContainer.innerHTML = '';
         gridContainer.style.display = "none";
-        document.getElementById("back-to-level").style.display = "none";
+        backToLevelButton.style.display = "none";
     });
 
     function generateGrid(rows, columns) {
-        const gridContainer = document.getElementById("grid-container");
-        gridContainer.innerHTML = ""; // Clear previous content
-    
-        const container = document.createElement("div");
-        container.classList.add("container");
-    
-        const table = document.createElement("table");
-        table.classList.add("table", "is-bordered", "is-fullwidth");
-    
-        const tbody = document.createElement("tbody");
+        const tableBody = document.querySelector('#minesweeper-table tbody');
+        tableBody.innerHTML = "";
     
         for (let i = 0; i < rows; i++) {
             const tr = document.createElement("tr");
@@ -62,13 +53,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 });
                 tr.appendChild(td);
             }
-            tbody.appendChild(tr);
+            tableBody.appendChild(tr);
         }
-    
-        table.appendChild(tbody);
-        container.appendChild(table);
-        gridContainer.appendChild(container);
         gridContainer.style.display = "block";
+
     }
 
     // Cell click event handler
@@ -81,6 +69,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function showBackButton() {
-        document.getElementById("back-to-level").style.display = "block";
+        backToLevelButton.style.display = "block";
     }
 });
