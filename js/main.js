@@ -45,7 +45,6 @@ document.addEventListener("DOMContentLoaded", function() {
             for (let j = 0; j < columns; j++) {
                 const td = document.createElement("td");
                 td.classList.add("square-cell", "has-background-black", "has-text-centered");
-                td.style.height = "30px"; // Adjust as needed
                 td.addEventListener("click", cellClicked);
                 td.addEventListener("contextmenu", function(event) {
                     event.preventDefault(); // Prevent the default context menu

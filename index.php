@@ -15,7 +15,7 @@
 
 <div class="hero is-fullheight is-primary is-bold">
     <div class="hero-body">
-        <div class="container has-text-centered">
+        <div class="container has-text-centered is-centered">
             <div class="columns is-centered">
                 <div class="column is-half">
                     <div id="start-container" class="box">
@@ -38,7 +38,7 @@
                     </div>
                 </div>
             </div>
-            <div class="columns is-centered">
+            <div class="columns is-centered contain-grid">
                 <div class="column">
                     <div id="grid-container" class="box" style="display: none;">
                             <table id="minesweeper-table" class="table is-bordered is-fullwidth">
