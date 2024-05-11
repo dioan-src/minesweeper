@@ -1,0 +1,7 @@
+.square-cell{
+    width:20px;
+    padding:0px !important;
+    font-size:13px;
+    height:20px;
+    cursor:pointer;
+}
