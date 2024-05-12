@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../handlers/ResponseHandler.php';
 require_once __DIR__ . '/../utils/RequestValidation.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     try{
         //read data
         $rawData = file_get_contents('php://input');
@@ -10,8 +10,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         //validate data
         if (RequestValidation::validateOpenSquare($postedData) == false) ResponseHandler::sendBadRequestResponse('Missing Parameters');
         //assign vars
-        $row = $postedData['row'];
-        $column = $postedData['column'];
         $boardRows = $postedData['boardRows'];
         $boardColumns = $postedData['boardColumns'];
         
