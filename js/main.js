@@ -52,8 +52,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const tr = document.createElement("tr");
             for (let j = 0; j < columns; j++) {
                 const td = document.createElement("td");
-                td.classList.add("square-cell", "has-background-black", "has-text-centered");
-                // has-background-danger  has-text-grey
+                td.classList.add("square-cell", "has-background-text-30", "has-text-centered");
 
                 if (isGameActive) {
                     td.addEventListener("click", cellClicked);
@@ -62,6 +61,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 if (board?.[i]?.[j] !== undefined) {
                     td.textContent = board[i][j];
+                    assignAdditionalClasses(td, board[i][j]);
                 }
                 
                 tr.appendChild(td);
@@ -69,6 +69,44 @@ document.addEventListener("DOMContentLoaded", function() {
             tableBody.appendChild(tr);
         }
         gridContainer.style.display = "block";
+    }
+
+    function assignAdditionalClasses(element, value) {
+        // Example logic: Add classes based on the value of the cell
+        switch (value) {
+            case 0:
+                element.classList.add("has-background-text-80", "has-text-text-80");
+                break;
+            case 1:
+                element.classList.add("has-background-primary-85", "has-text-black");
+                break;
+            case 2:
+                element.classList.add("has-background-warning-90", "has-text-black");
+                break;
+            case 3:
+                element.classList.add("has-background-warning-80", "has-text-black");
+                break;
+            case 4:
+                element.classList.add("has-background-warning-65", "has-text-black");
+                break;
+            case 5:
+                element.classList.add("has-background-danger-80", "has-text-black");
+                break;
+            case 6:
+                element.classList.add("has-background-danger-70", "has-text-black");
+                break;
+            case 7:
+                element.classList.add("has-background-danger-60", "has-text-black");
+                break;
+            case 8:
+                element.classList.add("has-background-danger-dark", "has-text-black");
+                break;
+            case FLAG_ICON:
+                element.classList.add("has-text-danger");
+                break;
+            default:
+                break;
+        }
     }
 
     function handleContextMenu(event) {
