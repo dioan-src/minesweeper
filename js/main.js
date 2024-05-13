@@ -2,6 +2,7 @@ const FETCH_BOARD_URL = '/api/FetchBoard.php';
 const OPEN_SQUARE_URL = '/api/OpenSquare.php';
 const TOUCH_SQUARE_URL = '/api/TouchSquare.php';
 const FLAG_SQUARE_URL = '/api/FlagSquare.php';
+const KILL_BOARD_URL = '/api/KillBoard.php';
 const LEFT_CLICK = 0;
 const RIGHT_CLICK = 2;
 const FLAG_ICON = '⚑';
@@ -14,6 +15,7 @@ document.addEventListener("DOMContentLoaded", function() {
     var level16x16Button = document.getElementById("level-16x16");
     var level16x30Button = document.getElementById("level-16x30");
     var backToLevelButton = document.getElementById("back-to-level");
+    var newGameButton = document.getElementById("new-game-button");
 
     startButton.addEventListener("click", function() {
         document.getElementById("start-container").style.display = "none";
@@ -22,19 +24,22 @@ document.addEventListener("DOMContentLoaded", function() {
 
     level8x8Button.addEventListener("click", function () {
         levelContainer.style.display = "none";
-        generateGrid(8, 8);
+        fetchBoard(8, 8);
+        document.getElementById("new-game-container").style.display = "block";
         showBackButton();
     });
 
     level16x16Button.addEventListener("click", function () {
         levelContainer.style.display = "none";
-        generateGrid(16, 16);
+        fetchBoard(16, 16);
+        document.getElementById("new-game-container").style.display = "block";
         showBackButton();
     });
 
     level16x30Button.addEventListener("click", function () {
         levelContainer.style.display = "none";
-        generateGrid(16, 30);
+        fetchBoard(16, 30);
+        document.getElementById("new-game-container").style.display = "block";
         showBackButton();
     });
 
@@ -42,6 +47,16 @@ document.addEventListener("DOMContentLoaded", function() {
         levelContainer.style.display = "block";
         gridContainer.style.display = "none";
         backToLevelButton.style.display = "none";
+        document.getElementById("new-game-container").style.display = "none";
+    });
+    
+    newGameButton.addEventListener("click", function () {
+        // Get the dimensions of the existing board
+        const board = document.getElementById('minesweeper-table');
+        const numRows = board.rows.length;
+        const numColumns = board.rows[0].cells.length;
+        killBoard(numRows, numColumns);
+        generateGrid(numRows, numColumns);
     });
 
     function generateGrid(rows, columns, board =null, isGameActive = true) {
@@ -206,6 +221,47 @@ document.addEventListener("DOMContentLoaded", function() {
                 
                 if (board  !== undefined && gameStatus  !== undefined) {
                     generateGrid(numRows, numColumns, board, gameStatus);
+                }
+            },
+            function(error) {
+                // Handle error if AJAX request fails
+                console.error('Error sending move to the backend:', error);
+            }
+        );
+    }
+
+    function killBoard(numRows, numColumns) {
+        sendAjaxRequest(
+            KILL_BOARD_URL,
+            'POST',
+            {boardRows: numRows, boardColumns: numColumns},
+            function(response) {
+                // Handle successful response from the backend
+                
+            },
+            function(error) {
+                // Handle error if AJAX request fails
+                console.error('Error sending move to the backend:', error);
+            }
+        );
+    }
+
+    function fetchBoard(numRows, numColumns) {
+        const url = `${FETCH_BOARD_URL}?boardRows=${numRows}&boardColumns=${numColumns}`;
+        sendAjaxRequest(
+            url,
+            'GET',
+            null,
+            function(response) {
+                // Handle successful response from the backend
+                const responseObject = JSON.parse(response);
+                board = responseObject.board;
+                gameStatus = responseObject.game_status;
+                
+                if (board  !== undefined && gameStatus  !== undefined) {
+                    generateGrid(numRows, numColumns, board, gameStatus);
+                }else{
+                    generateGrid(numRows, numColumns);
                 }
             },
             function(error) {

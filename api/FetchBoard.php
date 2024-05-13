@@ -1,21 +1,28 @@
 <?php
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);
+require_once __DIR__ . '/../models/Board.php';
 require_once __DIR__ . '/../handlers/ResponseHandler.php';
 require_once __DIR__ . '/../utils/RequestValidation.php';
+require_once __DIR__ . '/../handlers/CustomSessionHandler.php';
+require_once __DIR__ . '/../resources/BoardResource.php';
+CustomSessionHandler::initSession();
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     try{
-        //read data
-        $rawData = file_get_contents('php://input');
-        $postedData = json_decode($rawData, true);
         //validate data
-        if (RequestValidation::validateOpenSquare($postedData) == false) ResponseHandler::sendBadRequestResponse('Missing Parameters');
+        if (RequestValidation::validateActionOnBoard($_GET) == false) ResponseHandler::sendBadRequestResponse('Missing Parameters');
         //assign vars
-        $boardRows = $postedData['boardRows'];
-        $boardColumns = $postedData['boardColumns'];
-        
-        //handleMove
-        
-        ResponseHandler::sendSuccessResponse($responseData);
+        $boardRows = $_GET['boardRows'];
+        $boardColumns = $_GET['boardColumns'];
+        //fetch board
+        $board = CustomSessionHandler::fetchSessionBoard($boardRows, $boardColumns);
+        if ($board) {
+            ResponseHandler::sendSuccessResponse(BoardResource::toArray($board));
+        }else{
+            ResponseHandler::sendSuccessResponse(['message'=>'No Game Running']);
+        }
     }catch(Exception $e){
         ResponseHandler::sendFailResponse($e->getMessage());    
     }

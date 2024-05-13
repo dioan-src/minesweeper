@@ -12,23 +12,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $rawData = file_get_contents('php://input');
         $postedData = json_decode($rawData, true);
         //validate data
-        if (RequestValidation::validateActionOnSquare($postedData) == false) ResponseHandler::sendBadRequestResponse('Missing Parameters');
+        if (RequestValidation::validateActionOnBoard($postedData) == false) ResponseHandler::sendBadRequestResponse('Missing Parameters');
         //assign vars
-        $row = $postedData['row'];
-        $column = $postedData['column'];
         $boardRows = $postedData['boardRows'];
         $boardColumns = $postedData['boardColumns'];
         
+        CustomSessionHandler::deleteBoard($boardRows, $boardColumns);
         //fetch board
         $board = CustomSessionHandler::fetchSessionBoard($boardRows, $boardColumns);
-        // flag only if game has been already set
-        if ($board) {
-            $board->flagSquare( $board->getSquareAt($row, $column) );
-            //save board
-            CustomSessionHandler::storeBoard($boardRows, $boardColumns, $board);
-        }
         
-        ResponseHandler::sendSuccessResponse(BoardResource::toArray($board));
+        ResponseHandler::sendSuccessResponse(['message'=>'Successfully deleted board']);
     }catch(Exception $e){
         ResponseHandler::sendFailResponse($e->getMessage());    
     }

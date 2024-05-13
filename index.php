@@ -46,6 +46,9 @@
                             </tbody>
                         </table>
                 </div>
+                <div id="new-game-container" class="buttons is-centered" style="display: none;">
+                    <button id="new-game-button" class="button is-black is-medium has-text-primary">New Game</button>
+                </div>
             </div>
         </div>
         <div id="back-to-level" class="buttons is-centered" style="display: none;">

@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $rawData = file_get_contents('php://input');
         $postedData = json_decode($rawData, true);
         //validate data
-        if (RequestValidation::validateOpenSquare($postedData) == false) ResponseHandler::sendBadRequestResponse('Missing Parameters');
+        if (RequestValidation::validateActionOnSquare($postedData) == false) ResponseHandler::sendBadRequestResponse('Missing Parameters');
         //assign vars
         $row = $postedData['row'];
         $column = $postedData['column'];
