@@ -10,6 +10,7 @@ class Board
     private int $height;
     private int $minesNum;    
     private array $grid;
+    private array $mineCoordinates;
     private int $revealedCounter;
     private bool $isGameOver;
 
@@ -29,6 +30,7 @@ class Board
             $zeros = $this->create2dArrayOfZeros();
             $finalGrid = $this->generateMines($zeros, $seedHeight, $seedLength);
         }
+        $this->setMineCoordinates($finalGrid);
         $this->setGridMadeOfSquares($finalGrid);
         $this->setNeighborsOfSquares();
     }
@@ -61,6 +63,23 @@ class Board
     // Getter for $minesNum
     public function getMinesNum(): int {
         return $this->minesNum;
+    }
+
+    // Setter for $mineCoordinates
+    public function setMineCoordinates(array $grid): void
+    {
+        $mineCoords = [];
+        for ($i = 0; $i < $this->height; $i++) {
+            for ($j = 0; $j < $this->length; $j++) {
+                if ($grid[$i][$j] ==1) $mineCoords[] = ['height'=>$i, 'length'=>$j];
+            }
+        }
+        $this->mineCoordinates = $mineCoords;
+    }
+
+    // Getter for $mineCoordinates
+    public function getMineCoordinates(): array {
+        return $this->mineCoordinates;
     }
 
     // Setter for $revealedCounter
@@ -260,8 +279,12 @@ class Board
         if ($square->getIsRevealed()) return;
         $square->setIsRevealed(true);
         $this->setRevealedCounter( $this->getRevealedCounter()+1);
-        //if square has mine, set game as over and get out if func
-        if ($square->getHasMine()){$this->setIsGameOver(true); return;}
+        //if square has mine, set game as over reveal all mines
+        if ($square->getHasMine()){
+            $this->setIsGameOver(true);
+            $this->revealAllMines();
+            return;
+        }
         // //if square has no neighboring mines, reveale all neighboring squares
         if ($square->getNeighboringMines() == 0) $this->revealAllNeighbors($square);
         //set game is over if all non-mined cells have been revealed
@@ -289,5 +312,13 @@ class Board
         }
         //set game is over if all non-mined cells have been revealed
         if ($this->areAllNonMinedCellsRevealed()) $this->setIsGameOver(true);
+    }
+
+    public function revealAllMines(): void
+    {
+        foreach($this->mineCoordinates as $coords){
+            $square = $this->getSquareAt($coords['height'], $coords['length']);
+            $square?->setIsRevealed(true);
+        }
     }
 }
