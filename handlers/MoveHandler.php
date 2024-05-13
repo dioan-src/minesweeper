@@ -24,7 +24,7 @@ class MoveHandler
     public static function handleMove(string $moveInput, Board $board): void
     {
         $moveParts = explode('-', $moveInput);
-        if ( !self::validateMove($moveParts) ) {echo 'You fucked up. Wrong Move'. PHP_EOL; return;}
+        if ( !self::validateMove($moveParts) ) {echo 'Wrong Move. You can follow instructions right? '. PHP_EOL; return;}
         list($move, $row, $column) = self::extractMoveDetails($moveParts);
         if ( !method_exists($board, $move) ) return;
         $board->$move( $board->getSquareAt($row, $column) );

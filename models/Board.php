@@ -204,68 +204,6 @@ class Board
     }
 
     /**
-    * Display the current position of the grid of Squares
-    */
-    public function display()
-    {
-        // Print column numbers
-        echo "  ";
-        for ($j = 0; $j < $this->length; $j++) {
-            $this->formatCellOutput($j + 1);
-        }
-        echo PHP_EOL;
-        echo "  ";
-        for ($j = 0; $j < $this->length; $j++) {
-            $this->formatCellOutput('_');
-        }
-        echo PHP_EOL;
-
-        // Print board with row numbers and cells
-        for ($i = 0; $i < $this->height; $i++) {
-            // Print row number
-            $this->formatCellOutput(output:$i + 1,  suffix:'|');
-
-            // Print cells
-            for ($j = 0; $j < $this->length; $j++) {
-                $square = $this->getSquareAt($i, $j);
-                
-                //remove padding for the first column of cells
-                $positionPadflag = true;
-                
-                if ($square->getIsRevealed() == false){
-
-                    if ($square->getIsFlagged()){
-                        $this->formatCellOutput(output:BoardParameters::FLAGGED_SQUARE_DISPLAY_SYMBOL, pad:false, suffix:'  ');
-                        continue;
-                    }
-
-                    $this->formatCellOutput(output:BoardParameters::HIDDEN_SQUARE_DISPLAY_SYMBOL, pad:true, suffix:'  ');
-                    continue;
-                }
-
-                if ($square->getHasMine()){
-                    $this->formatCellOutput(output:BoardParameters::MINE_DISPLAY_SYMBOL, pad:false, suffix:'  ');
-                    continue;
-                }
-
-                $val = $square->getNeighboringMines() != 0 ? $square->getNeighboringMines() : ' ';
-                $this->formatCellOutput(output:$val, pad:false, suffix:'  ');
-                continue;
-            }
-            echo '|' . PHP_EOL;
-        }
-    }
-
-    /**
-    * Format the output, used by the display function
-    */
-    public function formatCellOutput($output, $pad = true, $suffix = ' '): void
-    {
-        if ($pad) $output = str_pad($output, 2, ' ', STR_PAD_LEFT);
-        echo $output . $suffix;
-    }
-
-    /**
     * Checks if coordinates are within the bounds of the grid
     */
     public function validateGridBoundaries(int $height, int $length)
