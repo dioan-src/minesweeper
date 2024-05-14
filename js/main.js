@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded", function() {
         levelContainer.style.display = "none";
         fetchBoard(8, 8);
         document.getElementById("new-game-container").style.display = "block";
+        gridContainer.style.display = "block";
         showBackButton();
     });
 
@@ -37,6 +38,7 @@ document.addEventListener("DOMContentLoaded", function() {
         levelContainer.style.display = "none";
         fetchBoard(16, 16);
         document.getElementById("new-game-container").style.display = "block";
+        gridContainer.style.display = "block";
         showBackButton();
     });
 
@@ -44,6 +46,7 @@ document.addEventListener("DOMContentLoaded", function() {
         levelContainer.style.display = "none";
         fetchBoard(16, 30);
         document.getElementById("new-game-container").style.display = "block";
+        gridContainer.style.display = "block";
         showBackButton();
     });
 
@@ -115,7 +118,6 @@ document.addEventListener("DOMContentLoaded", function() {
             }
             tableBody.appendChild(tr);
         }
-        gridContainer.style.display = "block";
     }
 
     function assignAdditionalClasses(element, value) {
@@ -192,7 +194,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 flagCell(row, column, numRows, numColumns);
             }
         }
-        //TODO another one to send to cell-touch - havent figured that out yet
     }
 
     function openCell(row, column, numRows, numColumns) {

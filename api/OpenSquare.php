@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $board = CustomSessionHandler::fetchSessionBoard($boardRows, $boardColumns);
         // check if Board exists, if not, initialize it
         if (!$board) {
-            $board = new Board(length:$boardRows, height:$boardColumns, seedHeight:$row, seedLength:$column);
+            $board = new Board(length:$boardColumns, height:$boardRows, seedHeight:$row, seedLength:$column);
         }
         $board->revealSquare( $board->getSquareAt($row, $column) );
 

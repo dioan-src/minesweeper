@@ -14,21 +14,19 @@
 <body>
 
 
-<div class="hero is-fullheight is-primary is-bold">
+<div class="hero is-fullheight has-background-black is-bold">
     <div class="container has-text-centered is-centered">
         <div class="columns is-centered m-3">
-            <div class="column is-half">
-                <div id="start-container" class="box has-box-shadow">
+            <div id="start-container" class="column is-half">
+                <div  id="start-container" class="box has-box-shadow">
                     <h2 class="title has-text-primary">Welcome to Minesweeper!</h2>
                     <div class="buttons is-centered">
                         <button id="start-button" class="button is-primary is-dark">Let's Play</button>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="columns is-centered">
-            <div class="column is-half">
-                <div id="level-container" class="box has-box-shadow" style="display: none;">
+            <div id="level-container" class="column is-half" style="display: none;">
+                <div  id="level-container" class="box has-box-shadow">
                     <h2 class="title has-text-primary">Select Difficulty Level</h2>
                     <div class="buttons is-centered">
                         <button id="level-8x8" class="button is-primary is-dark">8x8</button>
@@ -41,19 +39,19 @@
         <div class="columns is-centered contain-grid">
             <div class="column">
                 <div id="grid-container" class="box has-box-shadow" style="display: none;">
-                        <table id="minesweeper-table" class="table is-bordered is-fullwidth">
-                            <tbody>
-                                <!-- Table content will be dynamically generated here -->
-                            </tbody>
-                        </table>
+                    <table id="minesweeper-table" class="table is-bordered is-fullwidth">
+                        <tbody>
+                            <!-- Table content will be dynamically generated here -->
+                        </tbody>
+                    </table>
                 </div>
                 <div id="new-game-container" class="buttons is-centered" style="display: none;">
-                    <button id="new-game-button" class="button is-black is-medium has-text-primary has-box-shadow">New Game</button>
+                    <button id="new-game-button" class="button is-primary is-dark is-medium has-text-primary has-box-shadow">New Game</button>
                 </div>
             </div>
         </div>
         <div id="back-to-level" class="buttons is-centered" style="display: none;">
-            <button id="back-to-level-button" class="button is-black has-text-primary is-medium has-box-shadow">Back to Level Selection</button>
+            <button id="back-to-level-button" class="button is-primary is-dark has-text-primary is-medium has-box-shadow">Back to Level Selection</button>
         </div>
     </div>
 </div>
