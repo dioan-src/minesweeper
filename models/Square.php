@@ -158,4 +158,19 @@ class Square{
         }
         return true;
     }
+
+    public function getFlaggedNeighborsCount(): int
+    {
+        $count = 0;
+        foreach (array_keys(SquareParameters::NEIGHBORS) as $neighborName) {
+
+            $neighbor = $this->getNeighborWithName($neighborName);
+
+            if ($neighbor) {
+                if ( $neighbor->getIsFlagged() ) $count++;
+            }
+
+        }
+        return $count;
+    }
 }

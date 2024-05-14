@@ -254,7 +254,15 @@ class Board
     {
         if (!$square) return;
         if ($square->getIsRevealed() == false) return;
-        if ($square->isCorrectlyFlagged()) $this->revealAllNeighbors($square);
+        if ($square->isCorrectlyFlagged()) {
+            $this->revealAllNeighbors($square);
+        }else{
+            if ($square->getNeighboringMines() == $square->getFlaggedNeighborsCount()){
+                //square was flagged wrongly - game is over
+                $this->setIsGameOver(true);
+                $this->revealAllMines();
+            }
+        };
     }
 
     /**

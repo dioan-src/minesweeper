@@ -27,8 +27,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // flag only if game has been already set
         if ($board) {
             $board->touchSquare( $board->getSquareAt($row, $column) );
-            //save board
-            CustomSessionHandler::storeBoard($boardRows, $boardColumns, $board);
+            
+            if($board->isGameOver()){
+                CustomSessionHandler::deleteBoard($boardRows, $boardColumns);
+            }else{
+                CustomSessionHandler::storeBoard($boardRows, $boardColumns, $board);
+            }
         }
         
         ResponseHandler::sendSuccessResponse(BoardResource::toArray($board));

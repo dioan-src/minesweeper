@@ -6,6 +6,10 @@ const KILL_BOARD_URL = '/api/KillBoard.php';
 const LEFT_CLICK = 0;
 const RIGHT_CLICK = 2;
 const FLAG_ICON = '⚑';
+const SVG_PATH = "mine.svg";
+const WINNER_BANNER = 'I have now idea how you did it but you won. Congrats I gess?';
+const LOSER_BANNER = "Lol.. I knew you'd lose";
+
 
 document.addEventListener("DOMContentLoaded", function() {
     var startButton = document.getElementById("start-button");
@@ -59,6 +63,21 @@ document.addEventListener("DOMContentLoaded", function() {
         generateGrid(numRows, numColumns);
     });
 
+    document.getElementById('game-result-modal-close').addEventListener('click', function() {
+        hideGameResultModal();
+    });
+
+    function showGameResultModal(message) {
+        document.getElementById('game-result-message').innerText = message;
+        var gameResultModal = document.getElementById('game-result-modal');
+        gameResultModal.classList.add('is-active');
+    }
+
+    function hideGameResultModal() {
+        var gameResultModal = document.getElementById('game-result-modal');
+        gameResultModal.classList.remove('is-active');
+    }
+
     function generateGrid(rows, columns, board =null, isGameActive = true) {
         const tableBody = document.querySelector('#minesweeper-table tbody');
         tableBody.innerHTML = "";
@@ -75,7 +94,16 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
 
                 if (board?.[i]?.[j] !== undefined) {
-                    td.textContent = board[i][j];
+                    const cellContent = board[i][j];
+                    if (cellContent === '*') {
+                        // Create and append the SVG element
+                        const svg = document.createElement("img");
+                        svg.src = SVG_PATH;
+                        svg.classList.add("svg-icon");
+                        td.appendChild(svg);
+                    } else {
+                        td.textContent = cellContent;
+                    }
                     assignAdditionalClasses(td, board[i][j]);
                 }
                 
@@ -119,7 +147,8 @@ document.addEventListener("DOMContentLoaded", function() {
             case FLAG_ICON:
                 element.classList.add("has-text-danger");
                 break;
-            default:
+            case '*':
+                element.classList.add("has-background-danger");
                 break;
         }
     }
@@ -172,12 +201,15 @@ document.addEventListener("DOMContentLoaded", function() {
                 const responseObject = JSON.parse(response);
                 board = responseObject.board;
                 gameStatus = responseObject.game_status;
+                nonMinedCellsRevealed = responseObject.nonMinedCellsRevealed;
                 
                 if (board  !== undefined && gameStatus  !== undefined) {
                     generateGrid(numRows, numColumns, board, gameStatus);
+                    if (!gameStatus){ //game is over
+                        gameOutcomeBanner = nonMinedCellsRevealed ? WINNER_BANNER : LOSER_BANNER ;
+                        showGameResultModal(gameOutcomeBanner);
+                    }
                 }
-
-                //TODO show pop-up -> new game
             },
             function(error) {
                 // Handle error if AJAX request fails
@@ -218,9 +250,14 @@ document.addEventListener("DOMContentLoaded", function() {
                 const responseObject = JSON.parse(response);
                 board = responseObject.board;
                 gameStatus = responseObject.game_status;
+                nonMinedCellsRevealed = responseObject.nonMinedCellsRevealed;
                 
                 if (board  !== undefined && gameStatus  !== undefined) {
                     generateGrid(numRows, numColumns, board, gameStatus);
+                    if (!gameStatus){ //game is over
+                        gameOutcomeBanner = nonMinedCellsRevealed ? WINNER_BANNER : LOSER_BANNER ;
+                        showGameResultModal(gameOutcomeBanner);
+                    }
                 }
             },
             function(error) {
@@ -237,7 +274,6 @@ document.addEventListener("DOMContentLoaded", function() {
             {boardRows: numRows, boardColumns: numColumns},
             function(response) {
                 // Handle successful response from the backend
-                
             },
             function(error) {
                 // Handle error if AJAX request fails

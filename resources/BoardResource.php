@@ -32,7 +32,8 @@ class BoardResource
         }
         return [
             "board" => $boardArray,
-            "game_status"=> !$board->isGameOver() 
+            "game_status" => !$board->isGameOver(),
+            "nonMinedCellsRevealed" => $board->areAllNonMinedCellsRevealed()
         ];
     }
 }

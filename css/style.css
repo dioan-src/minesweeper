@@ -11,4 +11,19 @@
     cursor: pointer;
     border-width: 3px !important;
     border-color: #14161a !important;
+    border-radius: 6px;
+}
+
+.has-box-shadow{
+    box-shadow: 3px 3px 9px rgb(0, 0, 1) !important;
+}
+
+.centered-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.centered-flex > .delete {
+    margin-left: auto; /* Pushes the delete button to the far right */
 }
