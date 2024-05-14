@@ -12,14 +12,65 @@ const LOSER_BANNER = "Lol.. I knew you'd LOSE";
 
 
 document.addEventListener("DOMContentLoaded", function() {
+
+    var motherDiv = document.getElementById("mother-div");
+    var welcomingTitle = document.getElementById("welcoming-title");
+    var letsPlayContainer = document.getElementById("lets-play-container");
     var startButton = document.getElementById("start-button");
+    var selectLevelContainer = document.getElementById("select-level-container");
+    var levelTitle = document.getElementById("level-title");
     var levelContainer = document.getElementById("level-container");
     var gridContainer = document.getElementById("grid-container");
     var level8x8Button = document.getElementById("level-8x8");
     var level16x16Button = document.getElementById("level-16x16");
     var level16x30Button = document.getElementById("level-16x30");
     var backToLevelButton = document.getElementById("back-to-level");
+    var backButton = document.getElementById("back-to-level-button");
     var newGameButton = document.getElementById("new-game-button");
+    var modeButton = document.getElementById("mode-button");
+
+    modeButton.addEventListener("click", function() {
+        toggleMode();
+    });
+
+    function toggleMode() {
+        document.body.classList.toggle("light-mode");
+        var buttonText = modeButton.textContent.trim();
+        modeButton.textContent = buttonText === "Light Mode" ? "Dark Mode" : "Light Mode";
+        updateElementClasses();
+    }
+
+    function updateElementClasses() {
+        motherDiv.classList.toggle('has-background-black');
+        motherDiv.classList.toggle('has-background-light');
+        letsPlayContainer.classList.toggle('has-background-light');
+        welcomingTitle.classList.toggle('has-text-primary');
+        welcomingTitle.classList.toggle('has-text-link');
+        startButton.classList.toggle('is-primary');
+        startButton.classList.toggle('is-link');
+        selectLevelContainer.classList.toggle('has-background-light');
+        startButton.classList.toggle('is-inverted');
+        levelTitle.classList.toggle('has-text-primary');
+        levelTitle.classList.toggle('has-text-link');
+        level8x8Button.classList.toggle('is-primary');
+        level8x8Button.classList.toggle('is-link');
+        level8x8Button.classList.toggle('is-inverted');
+        level16x16Button.classList.toggle('is-primary');
+        level16x16Button.classList.toggle('is-link');
+        level16x16Button.classList.toggle('is-inverted');
+        level16x30Button.classList.toggle('is-primary');
+        level16x30Button.classList.toggle('is-link');
+        level16x30Button.classList.toggle('is-inverted');
+        backButton.classList.toggle('is-primary');
+        backButton.classList.toggle('is-link');
+        backButton.classList.toggle('is-inverted');
+        newGameButton.classList.toggle('is-primary');
+        newGameButton.classList.toggle('is-link');
+        newGameButton.classList.toggle('is-inverted');
+        modeButton.classList.toggle('is-primary');
+        modeButton.classList.toggle('is-link');
+        modeButton.classList.toggle('is-inverted');
+    }
 
     startButton.addEventListener("click", function() {
         document.getElementById("start-container").style.display = "none";

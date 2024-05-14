@@ -13,21 +13,20 @@
 </head>
 <body>
 
-
-<div class="hero is-fullheight has-background-black is-bold">
+<div id="mother-div" class="hero is-fullheight has-background-black is-bold">
     <div class="container has-text-centered is-centered">
         <div class="columns is-centered m-3">
             <div id="start-container" class="column is-half">
-                <div  id="start-container" class="box has-box-shadow">
-                    <h2 class="title has-text-primary">Welcome to Minesweeper!</h2>
+                <div id="lets-play-container" class="box has-box-shadow">
+                    <h2 id="welcoming-title" class="title has-text-primary">Welcome to Minesweeper!</h2>
                     <div class="buttons is-centered">
                         <button id="start-button" class="button is-primary is-dark">Let's Play</button>
                     </div>
                 </div>
             </div>
             <div id="level-container" class="column is-half" style="display: none;">
-                <div  id="level-container" class="box has-box-shadow">
-                    <h2 class="title has-text-primary">Select Difficulty Level</h2>
+                <div id="select-level-container" class="box has-box-shadow">
+                    <h2 id="level-title"  class="title has-text-primary">Select Difficulty Level</h2>
                     <div class="buttons is-centered">
                         <button id="level-8x8" class="button is-primary is-dark">8x8</button>
                         <button id="level-16x16" class="button is-primary is-dark">16x16</button>
@@ -46,12 +45,15 @@
                     </table>
                 </div>
                 <div id="new-game-container" class="buttons is-centered" style="display: none;">
-                    <button id="new-game-button" class="button is-primary is-dark is-medium has-text-primary has-box-shadow">New Game</button>
+                    <button id="new-game-button" class="button is-primary is-dark is-medium has-box-shadow">New Game</button>
                 </div>
             </div>
         </div>
         <div id="back-to-level" class="buttons is-centered" style="display: none;">
-            <button id="back-to-level-button" class="button is-primary is-dark has-text-primary is-medium has-box-shadow">Back to Level Selection</button>
+            <button id="back-to-level-button" class="button is-primary is-dark is-medium has-box-shadow">Back to Level Selection</button>
+        </div>
+        <div>
+            <button id="mode-button" class="button is-primary is-dark">Light Mode</button>
         </div>
     </div>
 </div>
