@@ -7,8 +7,8 @@ const LEFT_CLICK = 0;
 const RIGHT_CLICK = 2;
 const FLAG_ICON = '⚑';
 const SVG_PATH = "mine.svg";
-const WINNER_BANNER = 'I have now idea how you did it but you won. Congrats I gess?';
-const LOSER_BANNER = "Lol.. I knew you'd lose";
+const WINNER_BANNER = 'I have now idea how you did it but you WON. Congrats I gess?';
+const LOSER_BANNER = "Lol.. I knew you'd LOSE";
 
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -67,13 +67,17 @@ document.addEventListener("DOMContentLoaded", function() {
         hideGameResultModal();
     });
 
-    function showGameResultModal(message) {
+    function showGameResultModal(message, gameOutcome) {
         document.getElementById('game-result-message').innerText = message;
+        var modalContentBox = document.getElementById('modal-content-box');
+        modalContentBox.classList.add(gameOutcome ? 'has-background-success' : 'has-background-danger');
         var gameResultModal = document.getElementById('game-result-modal');
         gameResultModal.classList.add('is-active');
     }
 
     function hideGameResultModal() {
+        var modalContentBox = document.getElementById('modal-content-box');
+        modalContentBox.classList.remove('has-background-success', 'has-background-danger');
         var gameResultModal = document.getElementById('game-result-modal');
         gameResultModal.classList.remove('is-active');
     }
@@ -207,7 +211,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     generateGrid(numRows, numColumns, board, gameStatus);
                     if (!gameStatus){ //game is over
                         gameOutcomeBanner = nonMinedCellsRevealed ? WINNER_BANNER : LOSER_BANNER ;
-                        showGameResultModal(gameOutcomeBanner);
+                        showGameResultModal(gameOutcomeBanner, nonMinedCellsRevealed);
                     }
                 }
             },
@@ -256,7 +260,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     generateGrid(numRows, numColumns, board, gameStatus);
                     if (!gameStatus){ //game is over
                         gameOutcomeBanner = nonMinedCellsRevealed ? WINNER_BANNER : LOSER_BANNER ;
-                        showGameResultModal(gameOutcomeBanner);
+                        showGameResultModal(gameOutcomeBanner, nonMinedCellsRevealed);
                     }
                 }
             },

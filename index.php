@@ -61,14 +61,15 @@
 <div id="game-result-modal" class="modal">
     <div class="modal-background"></div>
     <div class="modal-content">
-        <div class="box centered-flex">
+        <div id="modal-content-box" class="box centered-flex has-text-black">
             <p id="game-result-message"></p>
             <button id="game-result-modal-close" class="delete" aria-label="close"></button>
         </div>
     </div>
 </div>
 
-<script src="js/main.js"></script>
+<script src="js/main.js?v=<?=time()?>"></script>
+
 
 </body>
 </html>
