@@ -25,5 +25,5 @@
 }
 
 .centered-flex > .delete {
-    margin-left: auto; /* Pushes the delete button to the far right */
+    margin-left: auto;
 }

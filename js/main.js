@@ -78,28 +78,24 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     level8x8Button.addEventListener("click", function () {
-        levelContainer.style.display = "none";
-        fetchBoard(8, 8);
-        document.getElementById("new-game-container").style.display = "block";
-        gridContainer.style.display = "block";
-        showBackButton();
+        selectGameLevelname(8, 8);
     });
 
     level16x16Button.addEventListener("click", function () {
-        levelContainer.style.display = "none";
-        fetchBoard(16, 16);
-        document.getElementById("new-game-container").style.display = "block";
-        gridContainer.style.display = "block";
-        showBackButton();
+        selectGameLevelname(16, 16);
     });
 
     level16x30Button.addEventListener("click", function () {
+        selectGameLevelname(16, 30);
+    });
+
+    function selectGameLevelname(row, column) {
         levelContainer.style.display = "none";
-        fetchBoard(16, 30);
+        fetchBoard(row, column);
         document.getElementById("new-game-container").style.display = "block";
         gridContainer.style.display = "block";
         showBackButton();
-    });
+    }
 
     backToLevelButton.addEventListener("click", function () {
         levelContainer.style.display = "block";

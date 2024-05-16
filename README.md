@@ -1,6 +1,6 @@
-# Game Web App
+# Minesweeper
 
-This is a web application for playing a game implemented in PHP 8.1.2 and JavaScript.
+This is a web application for playing minesweeper implemented in PHP 8.1.2 and JavaScript.
 
 ## Running the Game
 
@@ -29,7 +29,19 @@ For running the game in a Docker container, follow these steps:
 http://127.0.0.1:5001/
 ```
 
+### Stopping the Container
+To stop the running container, execute the following script:
+```
+./stop_container.sh
+```
+
+### Removing Container and Images
+To remove the container and the images previously created, execute the following script:
+```
+./remove_container_and_image.sh
+```
+
 ## Game Instructions
 - Left-click to open a closed square.
 - Right-click a closed square to flag/unflag it.
-- Left-click an open square once you've flagged all the correct squares to open its in-mined neighbors.
+- Left-click an opened square once you've flagged all the correct neighbors to open its un-mined neighbors.
