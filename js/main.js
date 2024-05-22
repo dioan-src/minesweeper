@@ -7,8 +7,13 @@ const LEFT_CLICK = 0;
 const RIGHT_CLICK = 2;
 const FLAG_ICON = '⚑';
 const SVG_PATH = "mine.svg";
+const MINE_NUM_ON_8_X_8_BOARD = 10;
+const MINE_NUM_ON_16_X_16_BOARD = 50;
+const MINE_NUM_ON_16_X_30_BOARD = 99;
 const WINNER_BANNER = 'I have now idea how you did it but you WON. Congrats I gess?';
 const LOSER_BANNER = "Lol.. I knew you'd LOSE";
+
+let gameActive = true;
 
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -79,14 +84,17 @@ document.addEventListener("DOMContentLoaded", function() {
 
     level8x8Button.addEventListener("click", function () {
         selectGameLevelname(8, 8);
+        document.getElementById('total-mines').textContent = MINE_NUM_ON_8_X_8_BOARD;
     });
 
     level16x16Button.addEventListener("click", function () {
         selectGameLevelname(16, 16);
+        document.getElementById('total-mines').textContent = MINE_NUM_ON_16_X_16_BOARD;
     });
 
     level16x30Button.addEventListener("click", function () {
         selectGameLevelname(16, 30);
+        document.getElementById('total-mines').textContent = MINE_NUM_ON_16_X_30_BOARD;
     });
 
     function selectGameLevelname(row, column) {
@@ -95,6 +103,8 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById("new-game-container").style.display = "block";
         gridContainer.style.display = "block";
         showBackButton();
+        document.getElementById('mines-found').textContent = 0;
+        gameActive = true;
     }
 
     backToLevelButton.addEventListener("click", function () {
@@ -102,6 +112,7 @@ document.addEventListener("DOMContentLoaded", function() {
         gridContainer.style.display = "none";
         backToLevelButton.style.display = "none";
         document.getElementById("new-game-container").style.display = "none";
+        gameActive = false;
     });
     
     newGameButton.addEventListener("click", function () {
@@ -111,6 +122,9 @@ document.addEventListener("DOMContentLoaded", function() {
         const numColumns = board.rows[0].cells.length;
         killBoard(numRows, numColumns);
         generateGrid(numRows, numColumns);
+        document.getElementById('mines-found').textContent = 0;
+        gameActive = false;
+        document.getElementById('timer').textContent = '';
     });
 
     document.getElementById('game-result-modal-close').addEventListener('click', function() {
@@ -132,7 +146,7 @@ document.addEventListener("DOMContentLoaded", function() {
         gameResultModal.classList.remove('is-active');
     }
 
-    function generateGrid(rows, columns, board =null, isGameActive = true) {
+    function generateGrid(rows, columns, board = null, isGameActive = true) {
         const tableBody = document.querySelector('#minesweeper-table tbody');
         tableBody.innerHTML = "";
     
@@ -239,6 +253,11 @@ document.addEventListener("DOMContentLoaded", function() {
             //request flag only on hidden/flagged squares
             if (cellContent == '' || cellContent == FLAG_ICON) {
                 flagCell(row, column, numRows, numColumns);
+                // if (cellContent == FLAG_ICON){
+                //     decreaseFoundMines();
+                // }else{
+                //     increaseFoundMines();
+                // }
             }
         }
     }
@@ -252,14 +271,23 @@ document.addEventListener("DOMContentLoaded", function() {
                 // Handle successful response from the backend
                 const responseObject = JSON.parse(response);
                 board = responseObject.board;
+                flaggedSquares = responseObject.flagged_squares;
                 gameStatus = responseObject.game_status;
                 nonMinedCellsRevealed = responseObject.nonMinedCellsRevealed;
+                createdAt = responseObject.created_at;
                 
                 if (board  !== undefined && gameStatus  !== undefined) {
+                    gameActive = gameStatus;
                     generateGrid(numRows, numColumns, board, gameStatus);
+                    if (flaggedSquares){
+                        setFlaggedSquares(flaggedSquares);
+                    }
                     if (!gameStatus){ //game is over
                         gameOutcomeBanner = nonMinedCellsRevealed ? WINNER_BANNER : LOSER_BANNER ;
                         showGameResultModal(gameOutcomeBanner, nonMinedCellsRevealed);
+                    }
+                    if (createdAt){
+                        startCountdown(createdAt);
                     }
                 }
             },
@@ -279,10 +307,14 @@ document.addEventListener("DOMContentLoaded", function() {
                 // Handle successful response from the backend
                 const responseObject = JSON.parse(response);
                 board = responseObject.board;
+                flaggedSquares = responseObject.flagged_squares;
                 gameStatus = responseObject.game_status;
                 
                 if (board  !== undefined && gameStatus  !== undefined) {
                     generateGrid(numRows, numColumns, board, gameStatus);
+                }
+                if (flaggedSquares){
+                    setFlaggedSquares(flaggedSquares);
                 }
             },
             function(error) {
@@ -305,6 +337,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 nonMinedCellsRevealed = responseObject.nonMinedCellsRevealed;
                 
                 if (board  !== undefined && gameStatus  !== undefined) {
+                    gameActive = gameStatus;
                     generateGrid(numRows, numColumns, board, gameStatus);
                     if (!gameStatus){ //game is over
                         gameOutcomeBanner = nonMinedCellsRevealed ? WINNER_BANNER : LOSER_BANNER ;
@@ -344,12 +377,20 @@ document.addEventListener("DOMContentLoaded", function() {
                 // Handle successful response from the backend
                 const responseObject = JSON.parse(response);
                 board = responseObject.board;
+                flaggedSquares = responseObject.flagged_squares;
                 gameStatus = responseObject.game_status;
+                createdAt = responseObject.created_at;
                 
                 if (board  !== undefined && gameStatus  !== undefined) {
                     generateGrid(numRows, numColumns, board, gameStatus);
                 }else{
                     generateGrid(numRows, numColumns);
+                }
+                if (flaggedSquares){
+                    setFlaggedSquares(flaggedSquares);
+                }
+                if (createdAt){
+                    startCountdown(createdAt);
                 }
             },
             function(error) {
@@ -374,4 +415,37 @@ document.addEventListener("DOMContentLoaded", function() {
         };
         xhr.send(JSON.stringify(data));
     }
+
+    function setFlaggedSquares(flaggedSquares) {
+        document.getElementById('mines-found').textContent = flaggedSquares;
+    }
+
+    function startCountdown(startTime) {
+        
+        var createdAt = new Date(startTime * 1000);
+        var targetDiv = document.getElementById('timer');
+        if (targetDiv.textContent != ''){
+            return;
+        }
+
+        function pad(num) {
+            return ("0" + parseInt(num)).substr(-2);
+        }
+        
+        function tick() {
+            if (!gameActive) return;  // Check if the game is still active
+
+            var now = new Date();
+            var difference = now - createdAt;
+            
+            var minutesDifference = pad(Math.floor(difference / 60000));
+            var secondsDifference = pad(Math.floor((difference % 60000) / 1000));
+            var timerString = minutesDifference + ":" + secondsDifference;
+        
+            targetDiv.textContent = timerString;
+      
+            setTimeout(tick, 1000);
+        }
+        tick();
+    }      
 });

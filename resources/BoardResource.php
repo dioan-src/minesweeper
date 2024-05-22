@@ -32,8 +32,11 @@ class BoardResource
         }
         return [
             "board" => $boardArray,
+            "total_mines" => $board->getMinesNum(),
+            "flagged_squares" => $board->getFlaggedSquaresCount(),
             "game_status" => !$board->isGameOver(),
-            "nonMinedCellsRevealed" => $board->areAllNonMinedCellsRevealed()
+            "nonMinedCellsRevealed" => $board->areAllNonMinedCellsRevealed(),
+            "created_at" => $board->getCreationTimestamp()
         ];
     }
 }

@@ -9,7 +9,8 @@
     <title>Minesweeper</title>
     <link rel="icon" href="mine.svg" type="image/svg+xml">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css?v=<?=time()?>">
 </head>
 <body>
 
@@ -38,6 +39,27 @@
         <div class="columns is-centered contain-grid">
             <div class="column">
                 <div id="grid-container" class="box has-box-shadow" style="display: none;">
+                    <div is="board-info" class="columns is-multiline is-mobile board-info">
+                        <div class="column is-one-quarter has-text-left">
+                            <div class="tooltip">
+                                <i class="fas fa-info-circle"></i>
+                                <span class="tooltiptext">
+                                    <ul>
+                                        <li>->Left-click to open a closed square.</li>
+                                        <li>->Right-click a closed square to flag/unflag it.</li>
+                                        <li>->Left-click an opened square once you've flagged all the correct neighbors to open its un-mined neighbors.</li>
+                                    </ul></span>
+                            </div>
+                        </div>
+                        <div class="column is-half">
+                            <p id="timer" class="has-text-white"></p>
+                        </div>
+                        <div class="column is-one-quarter has-text-right">
+                            <p id="mines-revealed" class="has-text-white">
+                                ⚑<span id="mines-found"></span>/<span id="total-mines"></span>
+                            </p>
+                        </div>
+                    </div>
                     <table id="minesweeper-table" class="table is-bordered is-fullwidth">
                         <tbody>
                             <!-- Table content will be dynamically generated here -->
@@ -53,7 +75,7 @@
             <button id="back-to-level-button" class="button is-primary is-dark is-medium has-box-shadow">Back to Level Selection</button>
         </div>
         <div>
-            <button id="mode-button" class="button is-primary is-dark">Light Mode</button>
+            <button id="mode-button" class="button is-primary is-dark has-box-shadow">Light Mode</button>
         </div>
     </div>
 </div>

@@ -13,9 +13,11 @@ class Board
     private array $mineCoordinates;
     private int $revealedCounter;
     private bool $isGameOver;
+    private int $creationTimestamp;
 
     public function __construct(int $length = 0, int $height = 0, array $presetGrid = null, int $seedHeight = 0, int $seedLength = 0)
     {
+        $this->creationTimestamp = time();
         $this->setRevealedCounter(0);
         $this->setIsGameOver(false);
         if($presetGrid) {
@@ -26,7 +28,7 @@ class Board
         }else if($length && $height){
             $this->length = $length;
             $this->height = $height;
-            $this->minesNum = (int)$length*$height*BoardParameters::MINES_PERCENTAGE;
+            $this->setMinesBasedOnBoardSize();
             $zeros = $this->create2dArrayOfZeros();
             $finalGrid = $this->generateMines($zeros, $seedHeight, $seedLength);
         }
@@ -110,6 +112,31 @@ class Board
     // Getter for $isGameOver
     public function getIsGameOver(): bool {
         return $this->isGameOver;
+    }
+
+    // Getter for $creationTimestamp
+    public function getCreationTimestamp(): int {
+        return $this->creationTimestamp;
+    }
+
+    public function setMinesBasedOnBoardSize(): void
+    {
+        if ($this->getHeight() == 8 && $this->getLength() == 8){
+            $this->setMinesNum(BoardParameters::MINE_NUM_ON_8_X_8_BOARD);
+            return;
+        } 
+        if ($this->getHeight() == 16 && $this->getLength() == 16){
+            $this->setMinesNum(BoardParameters::MINE_NUM_ON_16_X_16_BOARD);
+            return;
+        } 
+        if ($this->getHeight() == 16 && $this->getLength() == 30){
+            $this->setMinesNum(BoardParameters::MINE_NUM_ON_16_X_30_BOARD);
+            return;
+        }
+
+        $customMineNum = (int)$this->getHeight()*$this->getLength()*BoardParameters::MINES_PERCENTAGE;
+        $this->setMinesNum($customMineNum);
+        return;
     }
 
     /**
@@ -245,6 +272,23 @@ class Board
     public function isGameOver(): bool
     {
         return $this->isGameOver;
+    }
+
+    /**
+     * Returns flagged squares in the grid
+     */
+    public function getFlaggedSquaresCount(): int
+    {
+        $flaggedCount = 0;
+        foreach ($this->grid as $row) {
+            foreach ($row as $square) {
+                // Check if the square is flagged
+                if ($square->getIsFlagged()) {
+                    $flaggedCount++;
+                }
+            }
+        }
+        return $flaggedCount;
     }
 
     /**
